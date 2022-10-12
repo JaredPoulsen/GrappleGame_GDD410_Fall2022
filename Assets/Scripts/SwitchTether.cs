@@ -6,7 +6,7 @@ public class SwitchTether : MonoBehaviour
 {
     
     public Transform newTether;
-    public Swing swing;
+    public SwingController swing;
     void Update()
     {
         if(Input.GetButtonDown("Fire1"))

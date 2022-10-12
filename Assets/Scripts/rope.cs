@@ -9,7 +9,9 @@ public class rope : MonoBehaviour
     LineRenderer lr;
     private bool isTarget1 = true;
     public bool hasParent;
-    public Transform[] closest_tether;
+    public Camera cam;
+    public LayerMask GrappleObject;
+
 
     // Use this for initialization
     void Start()
@@ -30,42 +32,27 @@ public class rope : MonoBehaviour
     }
 
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
-        FindClosestTether();     
-    }
-    void FindClosestTether()
-    {
-        Transform bestTarget = null;
-        float closestDistanceSqr = Mathf.Infinity;
-        Vector3 currentPosition = transform.position;
-        foreach (Transform potentialTarget in closest_tether)
-        {
-            Vector3 directionToTarget = potentialTarget.position - currentPosition;
-            float dSqrToTarget = directionToTarget.sqrMagnitude;
-            if (dSqrToTarget < closestDistanceSqr)
-            {
-                closestDistanceSqr = dSqrToTarget;
-                bestTarget = potentialTarget;
-            }
-        }
+
         if (Input.GetButtonDown("Fire1"))
         {
-            lr.enabled = true;
+            RaycastHit hit;
+            Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+            if (Physics.Raycast(ray, out hit))
+            {
+                if (hit.collider.tag == "GrappleObject")
+                {
+                    hit.collider.gameObject.GetComponent<MeshRenderer>().material.color = Color.yellow;
+                }
+                print(hit.transform.name);
+                lr.enabled = true;
+            }
         }
         else if (Input.GetButtonDown("Fire2"))
         {
             lr.enabled = false;
         }
-        if (hasParent)
-        {
-            lr.SetPosition(0, transform.InverseTransformPoint(bestTarget.position));
-        }
-        else
-        {
-            lr.SetPosition(0, bestTarget.position);
-        }
-       
 
         lr = GetComponent<LineRenderer>();
         if (hasParent)
@@ -77,5 +64,16 @@ public class rope : MonoBehaviour
             lr.SetPosition(1, bob.position);
         }
 
+        if (hasParent)
+        {
+            lr.SetPosition(0, transform.InverseTransformPoint(curTarget.position));
+        }
+        else
+        {
+            lr.SetPosition(0, curTarget.position);
+        }
+
     }
+
 }
+

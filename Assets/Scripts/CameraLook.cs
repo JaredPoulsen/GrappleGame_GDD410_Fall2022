@@ -1,19 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CameraLook : MonoBehaviour {
 
     public Transform lookAt;
     public Transform camTransform;
-    public float sensitivityX = 1;
-    public float sensitivityY = 1;
+    public float sensitivityX = 4;
+    public float sensitivityY = 4;
     public float Y_ANGLE_MIN = -70.0f;
     public float Y_ANGLE_MAX = 70.0f;
+    public Camera cam;
 
     private float distance = 10;
     float currentX = 0;
     float currentY = 0;
+
+  
 
     private void Start()
     {

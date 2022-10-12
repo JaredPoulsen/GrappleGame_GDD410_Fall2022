@@ -17,28 +17,11 @@ public class Pendulum {
         arm.length = Vector3.Distance(bob_tr.transform.localPosition, tether.position);
     }
 
-    public Vector3 MoveBob(Vector3 pos, float time)
-    {
-        bob.velocity += GetConstrainedVelocity(pos, previousPosition, time);
-        bob.ApplyGravity();
-        bob.ApplyDampening();
-        bob.CapMaxSpeed();
-
-        pos += bob.velocity * time;
-
-        if (Vector3.Distance(pos, tether.position) < arm.length)
-        {
-            pos = Vector3.Normalize(pos - tether.position) * arm.length; ;
-            arm.length = (Vector3.Distance(pos, tether.position));
-            return pos;
-        }
-
-        previousPosition = pos;
-        return pos;
-    }
+   
     public Vector3 MoveBob(Vector3 pos, Vector3 prevPos, float time)
     {
         bob.velocity += GetConstrainedVelocity(pos, prevPos, time);
+        bob.velocity *= 5f;
         bob.ApplyGravity();
         bob.ApplyDampening();
         bob.CapMaxSpeed();

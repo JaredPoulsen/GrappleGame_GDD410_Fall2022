@@ -5,13 +5,13 @@ using Cinemachine;
 
 public class SwingController : MonoBehaviour
 {
-    //Walking State ONLY
+   
+
     public float speed = 6.0F;
     public float jumpSpeed = 20.0F;
     public float gravity = 20.0F;
     private Vector3 moveDirection = Vector3.zero;
-    
-    public CharacterController controller;
+    CharacterController controller;
     public Camera cam;
     enum State { Swinging, Falling, Walking };
     State state;
@@ -19,10 +19,9 @@ public class SwingController : MonoBehaviour
     Vector3 previousPosition;
     float distToGround;
     Vector3 hitPos;
-    public Transform[] closest_tether;
-    public LineRenderer lr;
+    public LayerMask GrappleObject;
 
-     void Start()
+    void Start()
     {
         controller = GetComponent<CharacterController>();
         state = State.Walking;
@@ -31,10 +30,12 @@ public class SwingController : MonoBehaviour
 
         distToGround = GetComponent<CapsuleCollider>().bounds.extents.y;
     }
+
     void Update()
-    { 
+    {
+
         DetermineState();
-        Debug.Log(state);
+
         switch (state)
         {
             case State.Swinging:
@@ -49,85 +50,78 @@ public class SwingController : MonoBehaviour
         }
         previousPosition = transform.localPosition;
     }
+
     bool IsGrounded()
     {
-       
+        print("Grounded");
         return Physics.Raycast(transform.position, -Vector3.up, distToGround + 0.1f);
     }
+
     void DetermineState()
     {
         // Determine State
         if (IsGrounded())
         {
             state = State.Walking;
-          
         }
         else if (Input.GetButtonDown("Fire1"))
         {
-             if (state == State.Walking)
-             {
-                pendulum.bob.velocity = moveDirection;
-             }
 
-            Transform bestTarget = null;
-            float closestDistanceSqr = Mathf.Infinity;
-            Vector3 currentPosition = transform.position;
-            foreach (Transform potentialTarget in closest_tether)
+            RaycastHit hit;
+            Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+            if (Physics.Raycast(ray, out hit,200, GrappleObject))
             {
-                Vector3 directionToTarget = potentialTarget.position - currentPosition;
-                float dSqrToTarget = directionToTarget.sqrMagnitude;
-                if (dSqrToTarget < closestDistanceSqr)
+                if (state == State.Walking)
                 {
-                    closestDistanceSqr = dSqrToTarget;
-                    bestTarget = potentialTarget;
+                    pendulum.bob.velocity = moveDirection;
                 }
+                pendulum.SwitchTether(hit.point);
+                state = State.Swinging;
+
             }
-            Debug.Log(bestTarget);
-            pendulum.SwitchTether(bestTarget.position);
-            state = State.Swinging;
-           
         }
         else if (Input.GetButtonDown("Fire2"))
         {
             if (state == State.Swinging)
             {
                 state = State.Falling;
-              
             }
         }
     }
 
     void DoSwingAction()
     {
-       
-        if (Input.GetAxis("Vertical") == 1)
+        if (Input.GetAxis("Vertical")== 1)
         {
-            pendulum.bob.velocity += pendulum.bob.velocity.normalized * .02f;
+            pendulum.bob.velocity += pendulum.bob.velocity.normalized * 0.5f;
+        }
+        if (Input.GetAxis("Vertical") == -1)
+        {
+            pendulum.bob.velocity += pendulum.bob.velocity.normalized *0.1f;
         }
         if (Input.GetAxis("Horizontal")== -1)
         {
-            pendulum.bob.velocity += -cam.transform.right * .01f;
+            pendulum.bob.velocity += -cam.transform.right * 0.1f;
         }
-        if (Input.GetAxis("Horizontal")==1)
+        if (Input.GetAxis("Horizontal")== 1)
         {
-            pendulum.bob.velocity += cam.transform.right * .01f;
+            pendulum.bob.velocity += cam.transform.right * 0.1f;
         }
         transform.localPosition = pendulum.MoveBob(transform.localPosition, previousPosition, Time.deltaTime);
         previousPosition = transform.localPosition;
+
+
     }
 
     void DoFallingAction()
     {
-        
         pendulum.arm.length = Mathf.Infinity;
         transform.localPosition = pendulum.Fall(transform.localPosition, Time.deltaTime);
         previousPosition = transform.localPosition;
-
     }
 
     void DoWalkingAction()
     {
-       
         pendulum.bob.velocity = Vector3.zero;
         if (controller.isGrounded)
         {
@@ -135,32 +129,29 @@ public class SwingController : MonoBehaviour
             moveDirection = Camera.main.transform.TransformDirection(moveDirection);
             moveDirection.y = 0.0f;
             moveDirection *= speed;
-
-            if(moveDirection != Vector3.zero)
-            {
-                transform.forward = moveDirection;
-            }
-
+  
             if (Input.GetButton("Jump"))
             {
                 moveDirection.y = jumpSpeed;
-               
             }
-
+            if (moveDirection != Vector3.zero)
+            {
+                transform.forward = moveDirection;
+            }
         }
         moveDirection.y -= gravity * Time.deltaTime;
         controller.Move(moveDirection * Time.deltaTime);
+
     }
 
-
-        void OnControllerColliderHit(ControllerColliderHit hit)
-        {
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
         if (hit.gameObject.name == "Respawn")
         {
             //if too far from arena, reset level
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
-        }
+    }
 
     void OnCollisionEnter(Collision collision)
     {
@@ -175,5 +166,4 @@ public class SwingController : MonoBehaviour
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
-    
 }
