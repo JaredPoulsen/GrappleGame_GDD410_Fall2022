@@ -21,7 +21,7 @@ public class Pendulum {
     public Vector3 MoveBob(Vector3 pos, Vector3 prevPos, float time)
     {
         bob.velocity += GetConstrainedVelocity(pos, prevPos, time);
-        bob.velocity *= 5f;
+       
         bob.ApplyGravity();
         bob.ApplyDampening();
         bob.CapMaxSpeed();

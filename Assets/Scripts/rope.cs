@@ -39,7 +39,7 @@ public class rope : MonoBehaviour
         {
             RaycastHit hit;
             Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-            if (Physics.Raycast(ray, out hit))
+            if (Physics.Raycast(ray, out hit,75))
             {
                 if (hit.collider.tag == "GrappleObject")
                 {

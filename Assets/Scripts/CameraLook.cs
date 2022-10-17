@@ -13,9 +13,9 @@ public class CameraLook : MonoBehaviour {
     public float Y_ANGLE_MAX = 70.0f;
     public Camera cam;
 
-    private float distance = 10;
+    private float distance = 20;
     float currentX = 0;
-    float currentY = 0;
+    float currentY = 10;
 
   
 

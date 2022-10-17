@@ -69,8 +69,9 @@ public class SwingController : MonoBehaviour
 
             RaycastHit hit;
             Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-            if (Physics.Raycast(ray, out hit,200, GrappleObject))
+            if (Physics.Raycast(ray, out hit,75, GrappleObject))
             {
+
                 if (state == State.Walking)
                 {
                     pendulum.bob.velocity = moveDirection;
@@ -93,19 +94,19 @@ public class SwingController : MonoBehaviour
     {
         if (Input.GetAxis("Vertical")== 1)
         {
-            pendulum.bob.velocity += pendulum.bob.velocity.normalized * 0.5f;
+            pendulum.bob.velocity += pendulum.bob.velocity.normalized * 2f;
         }
         if (Input.GetAxis("Vertical") == -1)
         {
-            pendulum.bob.velocity += pendulum.bob.velocity.normalized *0.1f;
+            pendulum.bob.velocity += pendulum.bob.velocity.normalized *.75f;
         }
         if (Input.GetAxis("Horizontal")== -1)
         {
-            pendulum.bob.velocity += -cam.transform.right * 0.1f;
+            pendulum.bob.velocity += -cam.transform.right * 0.3f;
         }
         if (Input.GetAxis("Horizontal")== 1)
         {
-            pendulum.bob.velocity += cam.transform.right * 0.1f;
+            pendulum.bob.velocity += cam.transform.right * 0.3f;
         }
         transform.localPosition = pendulum.MoveBob(transform.localPosition, previousPosition, Time.deltaTime);
         previousPosition = transform.localPosition;
